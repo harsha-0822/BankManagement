@@ -17,7 +17,7 @@ public class Main {
  private static ResultSet res; 
  private static PreparedStatement pstmnt; 
  public static void main(String[] args) { 
-  System.out.println("Select The Operation :"); 
+  System.out.println("\nSelect The Operation :"); 
   System.out.println(" 1. Select \n 2. Insert \n 3. Update \n 4. Delete \n 5. Exit \n "); 
   scan = new Scanner(System.in); 
   switch (scan.nextInt()) { 
@@ -74,30 +74,36 @@ public class Main {
  } 
  
  private static void UpdateRecord() { 
-  conn = MyFactory.getMyConnection(); 
-  if (conn != null) { 
-   String sql = "update  `bank` set `AccHolderName`=? where `ID`=?"; 
-   try { 
-    pstmnt = conn.prepareStatement(sql); 
-    System.out.println("enter ID"); 
-    int ID = scan.nextInt(); 
-    System.out.println("Enter Name"); 
-    String AccHolderName = scan.next(); 
- 
-    pstmnt.setString(1, AccHolderName); 
-    pstmnt.setInt(2, ID); 
-    int i = pstmnt.executeUpdate(); 
-    if (i == 1) { 
-     System.out.println("Record has been Updated"); 
-    } else { 
-     System.out.println("Failed to Update record"); 
-    } 
-   } catch (SQLException e) { 
-    // TODO Auto-generated catch block 
-    e.printStackTrace(); 
-   } 
-  } 
- } 
+	    conn = MyFactory.getMyConnection(); 
+	    if (conn != null) { 
+	        String sql = "UPDATE bank SET AccHolderName=? WHERE ID=?"; 
+	        try { 
+	            pstmnt = conn.prepareStatement(sql);
+
+	            System.out.print("Enter ID to update: "); 
+	            int ID = scan.nextInt();
+	            scan.nextLine(); // clear buffer
+
+	            System.out.print("Enter new Account Holder Name: "); 
+	            String AccHolderName = scan.nextLine(); // allows spaces
+
+	            pstmnt.setString(1, AccHolderName); 
+	            pstmnt.setInt(2, ID); 
+
+	            int i = pstmnt.executeUpdate(); 
+
+	            if (i == 1) { 
+	                System.out.println("✅ Record has been updated successfully!"); 
+	            } else { 
+	                System.out.println("❌ No record found with ID: " + ID); 
+	            } 
+	        } catch (SQLException e) { 
+	            e.printStackTrace(); 
+	        } 
+	    } else { 
+	        System.out.println("❌ Database connection failed."); 
+	    }
+	}
  
  private static void InsertRecord() { 
   conn = MyFactory.getMyConnection(); 
@@ -133,23 +139,33 @@ public class Main {
   } 
  } 
  
- private static void Display() { 
-  conn = MyFactory.getMyConnection(); 
-  if (conn != null) { 
-   String sql = "select * from `bank`"; 
-   try { 
-    stmnt = conn.createStatement(); 
-    res = stmnt.executeQuery(sql); 
-    System.out.printf(String.format("%-20s%-20s%20s%-20s%-20s\n", "ID", "AccHolderName", "AccNo","BranchName", 
-"PhoneNo")); 
-    while (res.next()) { 
-     System.out.printf(String.format("%-20s%20s%-20s%-20s%-20s\n", res.getInt(1), res.getString(2), res.getInt(3), res.getString(4),res.getInt(5))); 
-    } 
-   } catch (SQLException e) { 
-    // TODO Auto-generated catch block 
-    e.printStackTrace(); 
-   } 
-  } 
- } 
+ private static void Display() {
+	    conn = MyFactory.getMyConnection();
+	    if (conn != null) {
+	        String sql = "select * from bank";
+	        try {
+	            stmnt = conn.createStatement();
+	            res = stmnt.executeQuery(sql);
+
+	            // Table Header
+	            System.out.printf("%-10s %-20s %-15s %-20s %-15s%n",
+	                    "ID", "AccHolderName", "AccNo", "BranchName", "PhoneNo");
+	            System.out.println("--------------------------------------------------------------------------");
+
+	            // Table Rows
+	            while (res.next()) {
+	                System.out.printf("%-10d %-20s %-15d %-20s %-15d%n",
+	                        res.getInt("ID"),
+	                        res.getString("AccHolderName"),
+	                        res.getInt("AccNo"),
+	                        res.getString("BranchName"),
+	                        res.getLong("PhoneNo"));
+	            }
+
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	} 
  
 } 
